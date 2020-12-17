@@ -24,7 +24,12 @@ class BrowserTestBaseTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['test_page_test', 'form_test', 'system_test', 'node'];
+  public static $modules = [
+    'test_page_test',
+    'form_test',
+    'system_test',
+    'node',
+  ];
 
   /**
    * {@inheritdoc}
@@ -242,9 +247,17 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $sanitized = Html::escape($dangerous);
     $this->assertNoText($dangerous);
     $this->assertText($sanitized);
+  }
 
-    // Test getRawContent().
-    $this->assertSame($this->getSession()->getPage()->getContent(), $this->getSession()->getPage()->getContent());
+  /**
+   * Tests legacy getRawContent().
+   *
+   * @group legacy
+   * @expectedDeprecation AssertLegacyTrait::getRawContent() is deprecated in drupal:8.2.0 and is removed from drupal:10.0.0. Use $this->getSession()->getPage()->getContent() instead. See http://drupal.org/node/2735045
+   */
+  public function testGetRawContent() {
+    $this->drupalGet('test-encoded');
+    $this->assertSame($this->getSession()->getPage()->getContent(), $this->getRawContent());
   }
 
   /**
@@ -741,6 +754,39 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $assert->responseContains('<div class="unescaped">');
     $assert->responseContains("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
     $assert->assertNoEscaped("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
+  }
+
+  /**
+   * Tests that deprecation headers do not get duplicated.
+   *
+   * @group legacy
+   *
+   * @see \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware::__invoke()
+   */
+  public function testDeprecationHeaders() {
+    $this->drupalGet('/test-deprecations');
+
+    $deprecation_messages = [];
+    foreach ($this->getSession()->getResponseHeaders() as $name => $values) {
+      if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $name, $matches)) {
+        foreach ($values as $value) {
+          // Call \Drupal\simpletest\WebTestBase::error() with the parameters from
+          // the header.
+          $parameters = unserialize(urldecode($value));
+          if (count($parameters) === 3) {
+            if ($parameters[1] === 'User deprecated function') {
+              $deprecation_messages[] = (string) $parameters[0];
+            }
+          }
+        }
+      }
+    }
+
+    $this->assertContains('Test deprecation message', $deprecation_messages);
+    $test_deprecation_messages = array_filter($deprecation_messages, function ($message) {
+      return $message === 'Test deprecation message';
+    });
+    $this->assertCount(1, $test_deprecation_messages);
   }
 
 }

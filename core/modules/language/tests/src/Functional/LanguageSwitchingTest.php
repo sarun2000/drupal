@@ -20,7 +20,14 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['locale', 'locale_test', 'language', 'block', 'language_test', 'menu_ui'];
+  public static $modules = [
+    'locale',
+    'locale_test',
+    'language',
+    'block',
+    'language_test',
+    'menu_ui',
+  ];
 
   /**
    * {@inheritdoc}
@@ -69,7 +76,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    * @param string $block_label
    *   The label of the language switching block.
    *
-   * @see testLanguageBlock()
+   * @see self::testLanguageBlock()
    */
   protected function doTestLanguageBlockAuthenticated($block_label) {
     // Assert that the language switching block is displayed on the frontpage.
@@ -120,7 +127,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    * @param string $block_label
    *   The label of the language switching block.
    *
-   * @see testLanguageBlock()
+   * @see self::testLanguageBlock()
    */
   protected function doTestLanguageBlockAnonymous($block_label) {
     $this->drupalLogout();
@@ -292,7 +299,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * For authenticated users, the "active" class is set by JavaScript.
    *
-   * @see testLanguageLinkActiveClass()
+   * @see self::testLanguageLinkActiveClass()
    */
   protected function doTestLanguageLinkActiveClassAuthenticated() {
     $function_name = '#type link';
@@ -352,7 +359,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
   /**
    * For anonymous users, the "active" class is set by PHP.
    *
-   * @see testLanguageLinkActiveClass()
+   * @see self::testLanguageLinkActiveClass()
    */
   protected function doTestLanguageLinkActiveClassAnonymous() {
     $function_name = '#type link';

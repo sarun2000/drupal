@@ -36,7 +36,13 @@ class TaxonomyIndexTidUiTest extends UITestBase {
    *
    * @var array
    */
-  public static $modules = ['node', 'taxonomy', 'views', 'views_ui', 'taxonomy_test_views'];
+  public static $modules = [
+    'node',
+    'taxonomy',
+    'views',
+    'views_ui',
+    'taxonomy_test_views',
+  ];
 
   /**
    * A nested array of \Drupal\taxonomy\TermInterface objects.
@@ -71,7 +77,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
         $this->terms[$i][$j] = $term = Term::create([
           'vid' => 'tags',
           'name' => "Term $i.$j",
-          'parent' => isset($terms[$i][0]) ? $terms[$i][0]->id() : 0,
+          'parent' => isset($this->terms[$i][0]) ? $this->terms[$i][0]->id() : 0,
         ]);
         $term->save();
       }
